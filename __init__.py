@@ -41,10 +41,6 @@ def extract_minutes(date_string):
         minutes = date_object.minute
         return jsonify({'minutes': minutes})
 
-import requests
-from flask import render_template, jsonify
-from datetime import datetime
-
 @app.route("/commits")
 def commits():
     url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
