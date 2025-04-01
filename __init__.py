@@ -43,21 +43,7 @@ def extract_minutes(date_string):
 
 @app.route("/commits")
 def commits():
-    url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
-    response = requests.get(url)
-    data = response.json()
-
-    results = []
-    for commit in data:
-        try:
-            date_str = commit["commit"]["author"]["date"]
-            date_obj = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
-            formatted = date_obj.strftime("%Y-%m-%d %H:%M")
-            results.append({"datetime": formatted})
-        except:
-            continue
-
-    return render_template("commits.html", commit_data=results)
+    return render_template("commits.html")
 
 if __name__ == "__main__":
   app.run(debug=True)
