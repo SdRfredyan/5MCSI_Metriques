@@ -2,28 +2,23 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8">
-    <title>Statistiques des Commits</title>
+    <title>Commits GitHub</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
       body {
-        background: #111;
-        color: #00ffcc;
-        font-family: monospace;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
         padding: 20px;
       }
+
       h2 {
         text-align: center;
-        color: #00ffff;
       }
+
       #chart_div {
-        margin: auto;
-        width: 90%;
+        width: 100%;
         height: 500px;
-        background-color: #222;
-        border: 1px solid #00ffcc;
-        padding: 10px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px #00ffcc;
+        margin: auto;
       }
     </style>
   </head>
@@ -36,30 +31,24 @@
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-        fetch("/api/commits/")
-          .then(response => response.json())
-          .then(json => {
-            const data = new google.visualization.DataTable();
-            data.addColumn("string", "Minute");
-            data.addColumn("number", "Commits");
+        const data = new google.visualization.DataTable();
+        data.addColumn("string", "Minute");
+        data.addColumn("number", "Commits");
 
-            json.results.forEach(item => {
-              data.addRow([item.minute.toString(), item.count]);
-            });
+        const chartData = {{ data | tojson }};
+        chartData.forEach(item => {
+          data.addRow([item.minute.toString(), item.count]);
+        });
 
-            const options = {
-              title: "Commits GitHub par minute",
-              backgroundColor: "#222",
-              titleTextStyle: { color: "#00ffcc" },
-              legend: { position: "none" },
-              hAxis: { title: "Minute", textStyle: { color: "#00ffcc" }, titleTextStyle: { color: "#00ffcc" } },
-              vAxis: { title: "Commits", textStyle: { color: "#00ffcc" }, titleTextStyle: { color: "#00ffcc" } },
-              colors: ["#00ffff"]
-            };
+        const options = {
+          title: "Répartition des commits par minute (GitHub)",
+          hAxis: { title: "Minute" },
+          vAxis: { title: "Nombre de commits" },
+          legend: "none"
+        };
 
-            const chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
-            chart.draw(data, options);
-          });
+        const chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
+        chart.draw(data, options);
       }
     </script>
   </body>
