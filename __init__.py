@@ -36,23 +36,28 @@ def contact_form():
     return render_template("contact.html")
 
 @app.route("/commits/")
-def commits():
-    if request.headers.get("Accept") == "application/json":
-        url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"  # Ton dépôt
-        with urlopen(url) as response:
-            commits_data = json.loads(response.read().decode("utf-8"))
+def commits_graph():
+    url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
+    response = requests.get(url)
+    
+    if response.status_code != 200:
+        return jsonify({"error": "Impossible de récupérer les commits"}), 500
 
-        minutes = []
-        for commit in commits_data:
-            date_str = commit.get("commit", {}).get("author", {}).get("date")
-            if date_str:
-                dt = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
-                minutes.append(dt.minute)
+    commits = response.json()
+    minute_counts = Counter()
 
-        counts = Counter(minutes)
-        return jsonify(results=[{"minute": k, "count": v} for k, v in sorted(counts.items())])
+    for commit in commits:
+        try:
+            date_str = commit["commit"]["author"]["date"]  # Exemple : "2024-02-11T11:57:27Z"
+            dt = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+            minute = dt.minute
+            minute_counts[minute] += 1
+        except Exception as e:
+            continue
 
-    return render_template("commits.html")
+    # On transforme les données en tableau [{minute: x, count: y}]
+    data = [{"minute": m, "count": c} for m, c in sorted(minute_counts.items())]
+    return render_template("commits.html", data=data)
 
   
 if __name__ == "__main__":
