@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 from urllib.request import urlopen
+import urllib.request
 from datetime import datetime
 from collections import Counter
 import json
