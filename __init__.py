@@ -6,10 +6,6 @@ from urllib.request import urlopen
 import sqlite3
                                                                                                                                        
 app = Flask(__name__) #5 
-
-@app.route("/contact/")
-def MaPremiereAPI():
-    return "<h2>Ma page de contact</h2>"
                                                                                                                                        
 @app.route('/')
 def hello_world():
@@ -34,6 +30,11 @@ def mongraphique():
 @app.route("/histogramme/")
 def histogramme():
     return render_template("histogramme.html")
+
+@app.route("/contact/")
+def contact_form():
+    return render_template("contact.html")
+
   
 if __name__ == "__main__":
   app.run(debug=True)
