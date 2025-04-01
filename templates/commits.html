@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistiques des Commits</title>
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+  <style>
+    body {
+      background-color: #1a1a1a;
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 40px;
+    }
+    h2 {
+      text-align: center;
+      color: #00ffcc;
+    }
+    #chart_div {
+      width: 90%;
+      height: 500px;
+      margin: auto;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h2>Commits réalisés par minute</h2>
+  <div id="chart_div"></div>
+
+  <script>
+    google.charts.load("current", {packages:["corechart"]});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+      const rawData = {{ data | tojson }};
+      const data = new google.visualization.DataTable();
+      data.addColumn('string', 'Minute');
+      data.addColumn('number', 'Commits');
+
+      rawData.forEach(entry => {
+        data.addRow([entry.minute.toString(), entry.count]);
+      });
+
+      const options = {
+        title: 'Nombre de commits par minute',
+        legend: { position: 'none' },
+        hAxis: { title: 'Minute (0–59)' },
+        vAxis: { title: 'Nombre de commits' },
+        colors: ['#00ffcc']
+      };
+
+      const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
+    }
+  </script>
+</body>
+</html>
