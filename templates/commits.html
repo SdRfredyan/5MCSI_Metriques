@@ -1,72 +1,66 @@
 <!DOCTYPE html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Graphique des commits</title>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-      background-color: #f2f2f2;
-    }
-    h2 {
-      text-align: center;
-    }
-    #chart_div {
-      width: 100%;
-      height: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
-<body>
-  <h2>Histogramme des commits GitHub (par minute)</h2>
-  <div id="chart_div"></div>
+  <head>
+    <meta charset="UTF-8">
+    <title>Statistiques des Commits</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+      body {
+        background: #111;
+        color: #00ffcc;
+        font-family: monospace;
+        padding: 20px;
+      }
+      h2 {
+        text-align: center;
+        color: #00ffff;
+      }
+      #chart_div {
+        margin: auto;
+        width: 90%;
+        height: 500px;
+        background-color: #222;
+        border: 1px solid #00ffcc;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #00ffcc;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Nombre de commits par minute</h2>
+    <div id="chart_div"></div>
 
-  <script>
-    google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(fetchCommits);
+    <script>
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(drawChart);
 
-    function fetchCommits() {
-      fetch("https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits")
-        .then(response => response.json())
-        .then(data => {
-          const minuteCount = {};
+      function drawChart() {
+        fetch("/api/commits/")
+          .then(response => response.json())
+          .then(json => {
+            const data = new google.visualization.DataTable();
+            data.addColumn("string", "Minute");
+            data.addColumn("number", "Commits");
 
-          data.forEach(commit => {
-            const dateStr = commit.commit.author.date;
-            const date = new Date(dateStr);
-            const minute = date.getMinutes();
-            minuteCount[minute] = (minuteCount[minute] || 0) + 1;
+            json.results.forEach(item => {
+              data.addRow([item.minute.toString(), item.count]);
+            });
+
+            const options = {
+              title: "Commits GitHub par minute",
+              backgroundColor: "#222",
+              titleTextStyle: { color: "#00ffcc" },
+              legend: { position: "none" },
+              hAxis: { title: "Minute", textStyle: { color: "#00ffcc" }, titleTextStyle: { color: "#00ffcc" } },
+              vAxis: { title: "Commits", textStyle: { color: "#00ffcc" }, titleTextStyle: { color: "#00ffcc" } },
+              colors: ["#00ffff"]
+            };
+
+            const chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
+            chart.draw(data, options);
           });
-
-          drawChart(minuteCount);
-        });
-    }
-
-    function drawChart(dataObj) {
-      const data = new google.visualization.DataTable();
-      data.addColumn('string', 'Minute');
-      data.addColumn('number', 'Commits');
-
-      const rows = Object.entries(dataObj).map(([minute, count]) => [`${minute} min`, count]);
-      rows.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
-      data.addRows(rows);
-
-      const options = {
-        title: 'Commits GitHub par minute (sur les derniers commits)',
-        hAxis: { title: 'Minute', titleTextStyle: { color: '#333' } },
-        vAxis: { minValue: 0 },
-        legend: 'none'
-      };
-
-      const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
-    }
-  </script>
-</body>
+      }
+    </script>
+  </body>
 </html>
