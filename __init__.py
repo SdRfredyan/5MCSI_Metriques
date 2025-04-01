@@ -50,7 +50,7 @@ def extract_minutes(date_string):
 @app.route("/commits/")
 def commits():
     if request.headers.get("Accept") == "application/json":
-        url = "https://api.github.com/repos/TonyDIAS15/5MCSI_Metriques/commits"  # Ton dépôt
+        url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"  # Ton dépôt
         with urlopen(url) as response:
             commits_data = json.loads(response.read().decode("utf-8"))
 
