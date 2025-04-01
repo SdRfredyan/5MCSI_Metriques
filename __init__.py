@@ -42,7 +42,7 @@ def commits_graph():
         req = urlopen(
             urllib.request.Request(
                 url,
-                headers={"Authorization": "token VOTRE_TOKEN_ICI"}
+                headers={"Authorization": "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"}
             )
         )
         raw_data = req.read()
