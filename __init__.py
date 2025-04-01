@@ -1,9 +1,8 @@
-from flask import Flask, render_template_string, render_template, jsonify
-from flask import render_template
-from flask import json
-from datetime import datetime
+from flask import Flask, render_template, jsonify, request
 from urllib.request import urlopen
-import sqlite3
+from datetime import datetime
+from collections import Counter
+import json
 
                                                                                                                                        
 app = Flask(__name__) #5 
