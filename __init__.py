@@ -3,6 +3,7 @@ from flask import render_template
 from flask import json
 from datetime import datetime
 from urllib.request import urlopen
+from collections import Counter
 import sqlite3
                                                                                                                                        
 app = Flask(__name__)                                                                                                                  
@@ -41,9 +42,23 @@ def extract_minutes(date_string):
         minutes = date_object.minute
         return jsonify({'minutes': minutes})
 
-@app.route("/commits")
-def commits():
-    return render_template("commits.html")
+@app.route("/api/commits/")
+def api_commits():
+    url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
+    with urlopen(url) as response:
+        commits_data = json.loads(response.read().decode("utf-8"))
+
+    minutes_list = []
+    for commit in commits_data:
+        date_str = commit.get("commit", {}).get("author", {}).get("date")
+        if date_str:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+            minutes_list.append(date_obj.minute)
+
+    minutes_count = Counter(minutes_list)
+    results = [{"minute": minute, "count": count} for minute, count in minutes_count.items()]
+
+    return jsonify(results)
 
 if __name__ == "__main__":
   app.run(debug=True)
