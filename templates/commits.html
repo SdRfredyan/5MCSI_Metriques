@@ -2,39 +2,64 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8">
-    <title>Graphique des commits</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <title>Commits GitHub</title>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      #chart_div {
+        width: 100%;
+        max-width: 960px;
+        height: 500px;
+        margin: 40px auto;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      }
+    </style>
   </head>
   <body>
-    <h2 style="text-align:center;">Commits GitHub par minute</h2>
-    <div id="commit_chart" style="width: 100%; height: 500px;"></div>
+    <h1>Commits GitHub par minute</h1>
+    <div id="chart_div"></div>
 
     <script>
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-        fetch("/commits/")
+        fetch("/commits/", { headers: { "Accept": "application/json" } })
           .then(response => response.json())
-          .then(data => {
-            const dataTable = new google.visualization.DataTable();
-            dataTable.addColumn("string", "Minute");
-            dataTable.addColumn("number", "Nombre de commits");
+          .then(json => {
+            const data = new google.visualization.DataTable();
+            data.addColumn("string", "Minute");
+            data.addColumn("number", "Commits");
 
-            data.results.forEach(entry => {
-              dataTable.addRow([entry.minute + " min", entry.commits]);
+            json.results.forEach(entry => {
+              data.addRow([entry.minute.toString(), entry.count]);
             });
 
             const options = {
-              title: "Activité des commits par minute",
+              title: "Nombre de commits GitHub par minute",
               hAxis: { title: "Minute" },
-              vAxis: { title: "Commits" },
+              vAxis: { title: "Commits", minValue: 0 },
               legend: "none",
-              bar: { groupWidth: "70%" }
+              backgroundColor: "#fff",
+              colors: ["#3366cc"]
             };
 
-            const chart = new google.visualization.ColumnChart(document.getElementById("commit_chart"));
-            chart.draw(dataTable, options);
+            const chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
+            chart.draw(data, options);
           });
       }
     </script>
