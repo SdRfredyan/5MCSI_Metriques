@@ -1,80 +1,42 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
-    <meta charset="UTF-8" />
-    <title>Commits GitHub par minute</title>
-    <script src="https://www.gstatic.com/charts/loader.js"></script>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f9f9f9;
-        color: #333;
-        margin: 0;
-        padding: 20px;
-      }
-
-      h1 {
-        text-align: center;
-        margin-bottom: 40px;
-      }
-
-      #chart_div {
-        width: 100%;
-        max-width: 960px;
-        height: 500px;
-        margin: 0 auto;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      }
-
-      footer {
-        text-align: center;
-        margin-top: 40px;
-        font-size: 0.85em;
-        color: #666;
-      }
-    </style>
+    <meta charset="UTF-8">
+    <title>Graphique des commits</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   </head>
   <body>
-    <h1>Statistiques des Commits par Minute</h1>
-    <div id="chart_div"></div>
+    <h2 style="text-align:center;">Commits GitHub par minute</h2>
+    <div id="commit_chart" style="width: 100%; height: 500px;"></div>
 
     <script>
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-        fetch("/api/commits/")
+        fetch("/commits/")
           .then(response => response.json())
-          .then(json => {
-            const data = new google.visualization.DataTable();
-            data.addColumn("string", "Minute");
-            data.addColumn("number", "Commits");
+          .then(data => {
+            const dataTable = new google.visualization.DataTable();
+            dataTable.addColumn("string", "Minute");
+            dataTable.addColumn("number", "Nombre de commits");
 
-            json.results.forEach(entry => {
-              data.addRow([entry.minute.toString(), entry.count]);
+            data.results.forEach(entry => {
+              dataTable.addRow([entry.minute + " min", entry.commits]);
             });
 
             const options = {
-              title: "Nombre de commits GitHub par minute",
+              title: "Activité des commits par minute",
               hAxis: { title: "Minute" },
-              vAxis: { title: "Commits", minValue: 0 },
+              vAxis: { title: "Commits" },
               legend: "none",
-              colors: ["#3366cc"],
-              backgroundColor: "#fff"
+              bar: { groupWidth: "70%" }
             };
 
-            const chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
-            chart.draw(data, options);
+            const chart = new google.visualization.ColumnChart(document.getElementById("commit_chart"));
+            chart.draw(dataTable, options);
           });
       }
     </script>
-
-    <footer>
-      Exercice 6 – Projet Métriques NFE114
-    </footer>
   </body>
 </html>
