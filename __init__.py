@@ -34,6 +34,32 @@ def mongraphique():
 @app.route("/histogramme/")
 def histogramme():
     return render_template("histogramme.html")
+
+@app.route("/commits/")
+def commits():
+    url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
+    response = requests.get(url)
+    commit_data = response.json()
+    
+    minutes_count = {}
+
+    for commit in commit_data:
+        try:
+            date_str = commit["commit"]["author"]["date"]
+            date_obj = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+            minute = date_obj.minute
+            minutes_count[minute] = minutes_count.get(minute, 0) + 1
+        except Exception as e:
+            continue  # Ignore les erreurs s'il manque une clé
+
+    # Transformer le dict en tableau exploitable
+    results = [{"minute": str(minute), "commits": count} for minute, count in sorted(minutes_count.items())]
+
+    return jsonify(results=results)
+
+@app.route("/graph_commits/")
+def graph_commits():
+    return render_template("commits.html")
   
 if __name__ == "__main__":
   app.run(debug=True)
