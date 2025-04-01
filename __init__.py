@@ -37,7 +37,7 @@ def histogramme():
 
 @app.route("/commits/")
 def commits():
-    url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
+    url = "https://github.com/TonyDIAS15/5MCSI_Metriques/commits"
     response = requests.get(url)
     commit_data = response.json()
     
