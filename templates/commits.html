@@ -2,29 +2,28 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Statistiques des Commits</title>
+  <title>Commits GitHub</title>
   <script src="https://www.gstatic.com/charts/loader.js"></script>
   <style>
     body {
-      background-color: #1a1a1a;
-      color: #fff;
+      background-color: #1b1b1b;
+      color: #00ffcc;
       font-family: 'Courier New', Courier, monospace;
       padding: 40px;
     }
     h2 {
       text-align: center;
-      color: #00ffcc;
     }
     #chart_div {
+      margin: auto;
       width: 90%;
       height: 500px;
-      margin: auto;
       background-color: #fff;
     }
   </style>
 </head>
 <body>
-  <h2>Commits réalisés par minute</h2>
+  <h2>Commits par minute (projet OpenRSI)</h2>
   <div id="chart_div"></div>
 
   <script>
@@ -42,10 +41,10 @@
       });
 
       const options = {
-        title: 'Nombre de commits par minute',
+        title: 'Distribution des commits par minute',
         legend: { position: 'none' },
-        hAxis: { title: 'Minute (0–59)' },
-        vAxis: { title: 'Nombre de commits' },
+        hAxis: { title: 'Minute (0 à 59)' },
+        vAxis: { title: 'Commits' },
         colors: ['#00ffcc']
       };
 
