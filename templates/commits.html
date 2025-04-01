@@ -1,29 +1,50 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
-    <meta charset="UTF-8">
-    <title>Commits GitHub</title>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <meta charset="UTF-8" />
+    <title>Statistiques des Commits</title>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
     <style>
       body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        padding: 20px;
+        background-color: #0d0d0d;
+        color: #00f0ff;
+        font-family: 'Orbitron', sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
-      h2 {
-        text-align: center;
+      h1 {
+        margin-top: 40px;
+        font-size: 2em;
+        color: #00f0ff;
+        text-shadow: 0 0 5px #00f0ff, 0 0 10px #007bff;
       }
 
       #chart_div {
-        width: 100%;
+        width: 90%;
+        max-width: 1000px;
         height: 500px;
-        margin: auto;
+        margin: 40px auto;
+        background-color: #1a1a1a;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 20px #00f0ff;
+        border: 1px solid #00f0ff;
+      }
+
+      footer {
+        margin: 40px 0;
+        font-size: 0.9em;
+        color: #888;
       }
     </style>
   </head>
   <body>
-    <h2>Nombre de commits par minute</h2>
+    <h1>Commits GitHub par minute</h1>
     <div id="chart_div"></div>
 
     <script>
@@ -31,25 +52,46 @@
       google.charts.setOnLoadCallback(drawChart);
 
       function drawChart() {
-        const data = new google.visualization.DataTable();
-        data.addColumn("string", "Minute");
-        data.addColumn("number", "Commits");
+        fetch("/api/commits/")
+          .then(response => response.json())
+          .then(json => {
+            const data = new google.visualization.DataTable();
+            data.addColumn("string", "Minute");
+            data.addColumn("number", "Commits");
 
-        const chartData = {{ data | tojson }};
-        chartData.forEach(item => {
-          data.addRow([item.minute.toString(), item.count]);
-        });
+            json.results.forEach(entry => {
+              data.addRow([entry.minute.toString(), entry.count]);
+            });
 
-        const options = {
-          title: "Répartition des commits par minute (GitHub)",
-          hAxis: { title: "Minute" },
-          vAxis: { title: "Nombre de commits" },
-          legend: "none"
-        };
+            const options = {
+              title: "Répartition des commits (chaque minute)",
+              backgroundColor: "#1a1a1a",
+              legend: { position: "none" },
+              titleTextStyle: {
+                color: "#00f0ff",
+                fontSize: 18,
+                bold: true
+              },
+              hAxis: {
+                title: "Minute",
+                titleTextStyle: { color: "#00f0ff" },
+                textStyle: { color: "#00f0ff" }
+              },
+              vAxis: {
+                title: "Nombre de commits",
+                titleTextStyle: { color: "#00f0ff" },
+                textStyle: { color: "#00f0ff" },
+                minValue: 0
+              },
+              colors: ["#00ffff"]
+            };
 
-        const chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
-        chart.draw(data, options);
+            const chart = new google.visualization.ColumnChart(document.getElementById("chart_div"));
+            chart.draw(data, options);
+          });
       }
     </script>
+
+    <footer>Projet Métriques – NFE114 | OpenRSI</footer>
   </body>
 </html>
