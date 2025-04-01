@@ -39,11 +39,16 @@ def contact_form():
 def commits_graph():
     url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
     try:
-        response = urlopen(url)
-        raw_data = response.read()
+        req = urlopen(
+            urllib.request.Request(
+                url,
+                headers={"Authorization": "token VOTRE_TOKEN_ICI"}
+            )
+        )
+        raw_data = req.read()
         commits = json.loads(raw_data.decode("utf-8"))
     except Exception as e:
-        return jsonify({"error": "Erreur lors de la récupération des commits"}), 500
+        return jsonify({"error": "Erreur lors de la récupération des commits", "details": str(e)}), 500
 
     minute_counts = Counter()
 
