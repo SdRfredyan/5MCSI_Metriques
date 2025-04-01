@@ -40,5 +40,28 @@ def extract_minutes(date_string):
         date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
         minutes = date_object.minute
         return jsonify({'minutes': minutes})
+
+import requests
+from flask import render_template, jsonify
+from datetime import datetime
+
+@app.route("/commits")
+def commits():
+    url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
+    response = requests.get(url)
+    data = response.json()
+
+    results = []
+    for commit in data:
+        try:
+            date_str = commit["commit"]["author"]["date"]
+            date_obj = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ")
+            formatted = date_obj.strftime("%Y-%m-%d %H:%M")
+            results.append({"datetime": formatted})
+        except:
+            continue
+
+    return render_template("commits.html", commit_data=results)
+
 if __name__ == "__main__":
   app.run(debug=True)
